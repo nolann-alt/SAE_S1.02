@@ -7,7 +7,6 @@ import java.util.ArrayList;
  *
  * @author J-F. Kamp et C. Tibermacine
  */
-
 class GrundyRecBrute {
 
     /**
