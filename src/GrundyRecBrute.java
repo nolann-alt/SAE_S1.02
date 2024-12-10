@@ -5,7 +5,7 @@ import java.util.ArrayList;
  * Ce programme ne contient que les méthodes permettant de tester jouerGagnant()
  * Cette version est brute sans aucune amélioration
  *
- * @author J-F. Kamp et C. Tibermacine
+ * @author N.LESCOP - M.GOUELO
  */
 class GrundyRecBrute {
 
@@ -25,7 +25,6 @@ class GrundyRecBrute {
      * @return vrai s'il y a un coup gagnant, faux sinon
      */
     boolean jouerGagnant(ArrayList<Integer> jeu) {
-
         boolean gagnant = false;
 
         if (jeu == null) {
