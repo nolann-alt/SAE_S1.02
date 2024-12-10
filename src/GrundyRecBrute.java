@@ -5,7 +5,7 @@ import java.util.ArrayList;
  * Ce programme ne contient que les méthodes permettant de tester jouerGagnant()
  * Cette version est brute sans aucune amélioration
  *
- * @author N.LESCOP - M.GOUELO
+ * @author N.LESCOP - M.GOUELO - Je suis chaud en java
  */
 class GrundyRecBrute {
 
