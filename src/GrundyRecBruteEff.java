@@ -7,15 +7,61 @@ import java.util.ArrayList;
  *
  * @author N.LESCOP - M.GOUELO
  */
-class GrundyRecBrute {
+class GrundyRecBruteEff {
+
+    /**
+     * Compteur de récursions
+     */
+    int cpt = 0;
 
     /**
      * Méthode principal du programme
      */
     void principal() {
-        testJouerGagnant();
-        testPremier();
-        testSuivant();
+
+        char reponse;
+        do {
+            reponse = SimpleInput.getChar("Voulez vous lancer les tests ? (O/N) : ");
+
+        } while (reponse != 'O' && reponse != 'N');
+
+        if (reponse == 'O') {
+            testJouerGagnant();
+            testPremier();
+            testSuivant();
+            //testEstGagnanteEfficacite();
+
+        } else {
+            leJeu();
+        }
+    }
+
+    /**
+     * Méthode principale du jeu
+     */
+    void leJeu() {
+        ArrayList<Integer> jeu = creeTabJeu();
+        afficherJeu(jeu);
+    }
+
+    ArrayList<Integer> creeTabJeu(){
+        int nbAllumettes = 0;
+        ArrayList<Integer> jeu = new ArrayList<>();
+
+        while (nbAllumettes < 5 || nbAllumettes > 25) {
+            nbAllumettes = SimpleInput.getInt("Entrez un nombre d'allumettes entre 5 et 25 : ");
+        }
+        jeu.add(nbAllumettes);
+        return jeu;
+    }
+
+    void afficherJeu(ArrayList<Integer> jeu){
+        for (int i = 0 ; i < jeu.size() ; i++) {
+            for (int j = 0 ; j < jeu.get(i) ; j++) {
+                System.out.print('|');
+            }
+            System.out.print("\t");
+        }
     }
 
     /**
@@ -117,6 +163,7 @@ class GrundyRecBrute {
                         // à partir du jeu, si ligne = -1 il n'y a plus de décomposition possible
                         ligne = suivant(jeu, essai, ligne);
                     }
+                    cpt++;
                 }
             }
         }
@@ -182,6 +229,43 @@ class GrundyRecBrute {
             System.err.println("ERREUR\n");
         }
     }
+
+
+    /**
+     * Méthode de test de l'efficacite de estGagnante()
+     */
+    /*
+    void testEstGagnanteEfficacite() {
+        System.out.println("*** résultats des tests de l'efficacité de estGagnante() :");
+
+        // paramètres de estGagnante()
+        ArrayList<Integer> jeu = new ArrayList<Integer>();
+
+        // Variables pour mesurer le temps d'exécution
+        long t1, t2, diffT;
+
+        // Initialisation
+        n = 150000; // taille arraylist
+
+
+        for (int i = 1 ; i <= 6 ; i++) {
+            cpt = 0;
+
+            // Initialisation
+
+            t1 = System.nanoTime();
+            estGagnante(jeu);
+            t2 = System.nanoTime();
+
+            diffT = t2 - t1;
+            System.out.println("n = " + n);
+            System.out.println("Temps = " + diffT + " ns");
+            System.out.println("cpt / n = " + (double) cpt/n);
+
+            n = n * 2;
+        }
+    }
+    */
 
     /**
      * Divise en deux tas les allumettes d'une ligne de jeu (1 ligne = 1 tas).
