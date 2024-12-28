@@ -7,61 +7,134 @@ import java.util.ArrayList;
  *
  * @author N.LESCOP - M.GOUELO
  */
-class GrundyRecBruteEff {
+class GrundyRecBrute {
+
+    long cpt;
 
     /**
-     * Compteur de récursions
-     */
-    int cpt = 0;
-
-    /**
-     * Méthode principal du programme
+     * Méthode principal() du programme
      */
     void principal() {
-
-        char reponse;
+        char test;
         do {
-            reponse = SimpleInput.getChar("Voulez vous lancer les tests ? (O/N) : ");
+            test = SimpleInput.getChar("Souhaitez-vous voir les méthodes de test ? [Y/N] : ");
+        } while(test != 'y' && test != 'Y' && test != 'n' && test != 'N');
 
-        } while (reponse != 'O' && reponse != 'N');
-
-        if (reponse == 'O') {
+        if (test == 'y' || test == 'Y') {
             testJouerGagnant();
             testPremier();
             testSuivant();
-            //testEstGagnanteEfficacite();
+            testEstGagnanteEfficacite();
 
-        } else {
-            leJeu();
+        } else if (test == 'n' || test == 'N') {
+            JoueurVsMachine();
         }
     }
 
     /**
-     * Méthode principale du jeu
+     * Boucle de jeu principale
      */
-    void leJeu() {
-        ArrayList<Integer> jeu = creeTabJeu();
-        afficherJeu(jeu);
-    }
+    void JoueurVsMachine() {
+        System.out.println(" ---------- JEU GRUNDY ----------");
 
-    ArrayList<Integer> creeTabJeu(){
-        int nbAllumettes = 0;
-        ArrayList<Integer> jeu = new ArrayList<>();
+        // Création joueur
+        String joueur;
+        String machine = "Griddy";
+        String joueurActuel; // Qui enregistre qui doit jouer pendant le tour actuel
 
-        while (nbAllumettes < 5 || nbAllumettes > 25) {
-            nbAllumettes = SimpleInput.getInt("Entrez un nombre d'allumettes entre 5 et 25 : ");
+        do {
+            joueur = SimpleInput.getString("Quel est votre pseudo : ");
+        } while(joueur.length() < 3);
+
+        System.out.println("On détermine aléatoirement qui est ce qui commence...");
+        int PileFace = (int) Math.random();
+        if (PileFace == 0) {
+            System.out.println(joueur + " joue en premier !");
+            joueurActuel = joueur;
+        } else {
+            System.out.println(machine + " joue en première !");
+            joueurActuel = machine;
         }
-        jeu.add(nbAllumettes);
-        return jeu;
-    }
 
-    void afficherJeu(ArrayList<Integer> jeu){
-        for (int i = 0 ; i < jeu.size() ; i++) {
-            for (int j = 0 ; j < jeu.get(i) ; j++) {
-                System.out.print('|');
+        // Initialisation de la liste de tas
+        ArrayList<Integer> jeu = new ArrayList<Integer>();
+        jeu.add(7);
+
+        int ligne;
+        int nb;
+        boolean running = true;
+        boolean gagner;
+        while (running) {
+            System.out.println("Au tour de " + joueurActuel + " de jouer !");
+            afficher(jeu);
+
+            // Si c'est au joueur de jouer...
+            if (joueurActuel == joueur) {
+                do {
+                    ligne = SimpleInput.getInt("Sur quel tas voulez-vous agir : ");
+                } while(ligne < 0 || ligne >= jeu.size() || jeu.get(ligne) <= 2);
+
+                do {
+                    nb = SimpleInput.getInt("Combien d'allumettes voulez-vous retirer du tas : ");
+                } while(2 * nb == jeu.get(ligne) || nb <= 0 || nb >= jeu.get(ligne));
+
+                enlever(jeu, ligne, nb);
+
+                // Sinon c'est à la machine de jouer
+            } else {
+
+                // On test si la position est gagnante ; Si c'est gagnant la machine joue automatiquement
+                gagner = jouerGagnant(jeu);
+
+                if (!gagner) { // La position n'est pas gagnante pour la machine ; Elle joue aléatoirement
+
+                    do {
+                        ligne = (int) Math.random() * jeu.size(); // ligne aléatoire
+                    } while(jeu.get(ligne) <= 2);
+
+                    do {
+                        nb = (int) Math.random() * jeu.get(ligne); // nombre d'allumette aléatoire
+                    } while(2 * nb == jeu.get(ligne));
+
+                    enlever(jeu, ligne, nb);
+
+                }
             }
-            System.out.print("\t");
+
+            // On test si une décomposition est possible pour la prochain tour
+            // Si non, le jeu est terminé et le joueur actuel gagne
+            if (estPossible(jeu) == false) {
+                System.out.println("Bravo " + joueurActuel + " tu as gagné la partie !");
+                running = false;
+
+                // Sinon on change de joueur pour le tour suivant
+            } else {
+                // Changement de joueur
+                if (joueurActuel == joueur) {
+                    joueurActuel = machine;
+                } else {
+                    joueurActuel = joueur;
+                }
+            }
         }
+    }
+
+    /**
+     * Créer un affichage du jeu dans le terminal
+     * @param jeu plateau de jeu avec les tas d'allumettes
+     */
+    void afficher(ArrayList<Integer> jeu) {
+
+        // Affichage du jeu
+        System.out.println("Plateau de jeu : ");
+        for (int i = 0 ; i < jeu.size() ; i++) {
+            System.out.print("    ");
+            for (int j = 0 ; j < jeu.get(i) ; j++) {
+                System.out.print("|");
+            }
+        }
+        System.out.println();
+        System.out.println();
     }
 
     /**
@@ -84,7 +157,7 @@ class GrundyRecBruteEff {
             // mémorise le tas (nbre d'allumettes) qui a été décomposé
             int ligne = premier(jeu, essai);
 
-            // mise en oeuvre de la règle numéro2
+            // Mise en oeuvre de la règle numéro2
             // Une situation (ou position) est dite gagnante pour la machine, s’il existe AU MOINS UNE décomposition
             // (c-à-d UNE action qui consiste à décomposer un tas en 2 tas inégaux) perdante pour l’adversaire. C'est
             // évidemment cette décomposition perdante qui sera choisie par la machine.
@@ -144,6 +217,8 @@ class GrundyRecBruteEff {
 
                 while ( (ligne != -1) && ret) {
 
+                    cpt++; // compteur du nombre de tour de boucle pour la méthode efficacité
+
                     // mise en oeuvre de la règle numéro1
                     // Une situation (ou position) est dite perdante si et seulement si TOUTES ses décompositions possibles
                     // (c-à-d TOUTES les actions qui consistent à décomposer un tas en 2 tas inégaux) sont TOUTES gagnantes
@@ -163,7 +238,6 @@ class GrundyRecBruteEff {
                         // à partir du jeu, si ligne = -1 il n'y a plus de décomposition possible
                         ligne = suivant(jeu, essai, ligne);
                     }
-                    cpt++;
                 }
             }
         }
@@ -187,6 +261,49 @@ class GrundyRecBruteEff {
         }
         return ret;
     }
+
+
+    /**
+     * Méthode testant l'efficacité de estGagnante()
+     */
+    void testEstGagnanteEfficacite() {
+
+        System.out.println("*** résultats des tests de l'efficacité de estGagnante() :");
+
+        // paramètres de estGagnante()
+        ArrayList<Integer> jeu = new ArrayList<Integer>();
+        boolean gagnant;
+
+        // Variables pour mesurer le temps d'exécution
+        long t1, t2, diffT;
+
+        // Initialisation du nombre d'allumette
+        int n = 3;
+        jeu.add(n);
+
+        for (int i = 1 ; i <= 22 ; i++) {
+            cpt = 0;
+
+            // Initialisation
+            jeu = new ArrayList<Integer>();
+            jeu.add(n);
+
+            t1 = System.nanoTime();
+            gagnant = estGagnante(jeu);
+            t2 = System.nanoTime();
+
+            diffT = t2 - t1;
+            System.out.println("n = " + n);
+            System.out.println("Temps = " + diffT + " ns");
+
+            // La complexité de l'algorithme est 2 puissance n. Pour chaque tas on rajoute les décomposition en sous tas qui se décompose également etc...
+            // On arrive sur une configuration tel que 2 * 2 * 2 * 2 * 2.....
+            System.out.println("cpt / n = " + (double) cpt / Math.pow(2, n) );
+
+            n++;
+        }
+    }
+
 
     /**
      * Tests succincts de la méthode joueurGagnant()
@@ -229,43 +346,6 @@ class GrundyRecBruteEff {
             System.err.println("ERREUR\n");
         }
     }
-
-
-    /**
-     * Méthode de test de l'efficacite de estGagnante()
-     */
-    /*
-    void testEstGagnanteEfficacite() {
-        System.out.println("*** résultats des tests de l'efficacité de estGagnante() :");
-
-        // paramètres de estGagnante()
-        ArrayList<Integer> jeu = new ArrayList<Integer>();
-
-        // Variables pour mesurer le temps d'exécution
-        long t1, t2, diffT;
-
-        // Initialisation
-        n = 150000; // taille arraylist
-
-
-        for (int i = 1 ; i <= 6 ; i++) {
-            cpt = 0;
-
-            // Initialisation
-
-            t1 = System.nanoTime();
-            estGagnante(jeu);
-            t2 = System.nanoTime();
-
-            diffT = t2 - t1;
-            System.out.println("n = " + n);
-            System.out.println("Temps = " + diffT + " ns");
-            System.out.println("cpt / n = " + (double) cpt/n);
-
-            n = n * 2;
-        }
-    }
-    */
 
     /**
      * Divise en deux tas les allumettes d'une ligne de jeu (1 ligne = 1 tas).
@@ -558,4 +638,3 @@ class GrundyRecBruteEff {
     }
 
 }
-
