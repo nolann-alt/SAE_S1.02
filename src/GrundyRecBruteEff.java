@@ -1,3 +1,4 @@
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 /**
@@ -7,8 +8,9 @@ import java.util.ArrayList;
  *
  * @author N.LESCOP - M.GOUELO
  */
-class GrundyRecBrute {
+class GrundyRecBruteEff {
 
+    /** Compteur pour mesurer l'efficacité de la méthode estGagnante() */
     long cpt;
 
     /**
@@ -101,10 +103,11 @@ class GrundyRecBrute {
                 }
             }
 
-            // On test si une décomposition est possible pour la prochain tour
+            // On test si une décomposition est possible pour le prochain tour
             // Si non, le jeu est terminé et le joueur actuel gagne
             if (estPossible(jeu) == false) {
                 System.out.println("Bravo " + joueurActuel + " tu as gagné la partie !");
+                afficher(jeu);
                 running = false;
 
                 // Sinon on change de joueur pour le tour suivant
@@ -268,11 +271,10 @@ class GrundyRecBrute {
      */
     void testEstGagnanteEfficacite() {
 
-        System.out.println("*** résultats des tests de l'efficacité de estGagnante() :");
+        System.out.println("*** résultats des tests de l'efficacité de estGagnante() : ***");
 
         // paramètres de estGagnante()
         ArrayList<Integer> jeu = new ArrayList<Integer>();
-        boolean gagnant;
 
         // Variables pour mesurer le temps d'exécution
         long t1, t2, diffT;
@@ -289,7 +291,7 @@ class GrundyRecBrute {
             jeu.add(n);
 
             t1 = System.nanoTime();
-            gagnant = estGagnante(jeu);
+            estGagnante(jeu);
             t2 = System.nanoTime();
 
             diffT = t2 - t1;
@@ -298,7 +300,8 @@ class GrundyRecBrute {
 
             // La complexité de l'algorithme est 2 puissance n. Pour chaque tas on rajoute les décomposition en sous tas qui se décompose également etc...
             // On arrive sur une configuration tel que 2 * 2 * 2 * 2 * 2.....
-            System.out.println("cpt / n = " + (double) cpt / Math.pow(2, n) );
+            System.out.println("cpt / n = " + (double) cpt / Math.pow(2, n));
+            System.out.println();
 
             n++;
         }
@@ -636,5 +639,4 @@ class GrundyRecBrute {
             System.err.println("ERREUR\n");
         }
     }
-
 }
