@@ -1,4 +1,3 @@
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 /**
@@ -13,6 +12,7 @@ class GrundyRecPerdantes {
     /** Compteur pour mesurer l'efficacité de la méthode estGagnante() */
     long cpt;
 
+    /** Liste des positions perdantes */
     ArrayList<ArrayList<Integer>> posPerdantes = new ArrayList<ArrayList<Integer>>();
 
     /**
@@ -39,6 +39,9 @@ class GrundyRecPerdantes {
      * Boucle de jeu principale
      */
     void JoueurVsMachine() {
+        // Suppression des positions perdantes précédentes
+        posPerdantes.clear();
+
         System.out.println(" ---------- JEU GRUNDY ----------");
 
         // Création joueur
@@ -139,9 +142,6 @@ class GrundyRecPerdantes {
         } else {
             if (posPerdantes.contains(jeu)){
                 connue = true;
-
-            } else {
-                connue = false;
             }
         }
 
@@ -237,6 +237,7 @@ class GrundyRecPerdantes {
 
             else {
                 if (estConnuePerdante(jeu) == true) {
+                    System.out.println("Position perdante déjà connue.");
                     ret = true;
 
                 } else {
@@ -265,7 +266,24 @@ class GrundyRecPerdantes {
 
                             // Si UNE SEULE décomposition (à partir du jeu) est perdante (pour l'adversaire) alors le jeu n'EST PAS perdant.
                             // On renverra donc false : la situation (jeu) n'est PAS perdante.
-                            posPerdantes.add(new ArrayList<>(essai));
+                            essai.stream().allMatch(tas -> tas > 2);
+
+                            for (int i = 0; i < essai.size() - 1; i++) {
+                                int indexMin = i;
+                                for (int j = i + 1; j < essai.size(); j++) {
+                                    if (essai.get(j) < essai.get(indexMin)) {
+                                        indexMin = j;
+                                    }
+                                }
+                                // Échanger les éléments
+                                int temp = essai.get(i);
+                                essai.set(i, essai.get(indexMin));
+                                essai.set(indexMin, temp);
+                            }
+
+                            if (! posPerdantes.contains(essai)) {
+                                posPerdantes.add(new ArrayList<>(essai));
+                            }
                             ret = false;
 
                         } else {
@@ -298,7 +316,7 @@ class GrundyRecPerdantes {
     }
 
 
-    /**
+    /**import java.sql.SQLOutput;
      * Méthode testant l'efficacité de estGagnante()
      */
     void testEstGagnanteEfficacite() {
