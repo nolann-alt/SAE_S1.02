@@ -46,7 +46,7 @@ class GrundyRecPerdantes {
 
         // Création joueur
         String joueur;
-        String machine = "Griddy";
+        String machine = "Grundy";
         String joueurActuel; // Qui enregistre qui doit jouer pendant le tour actuel
 
         do {
@@ -54,7 +54,7 @@ class GrundyRecPerdantes {
         } while(joueur.length() < 3);
 
         System.out.println("On détermine aléatoirement qui est ce qui commence...");
-        int PileFace = (int) Math.random();
+        int PileFace = (int) Math.random() + 1;
         if (PileFace == 0) {
             System.out.println(joueur + " joue en premier !");
             joueurActuel = joueur;
@@ -96,12 +96,13 @@ class GrundyRecPerdantes {
                 if (!gagner) { // La position n'est pas gagnante pour la machine ; Elle joue aléatoirement
 
                     do {
-                        ligne = (int) Math.random() * jeu.size(); // ligne aléatoire
+                        ligne = (int) (Math.random() * jeu.size()); // ligne aléatoire
                     } while(jeu.get(ligne) <= 2);
 
                     do {
-                        nb = (int) Math.random() * jeu.get(ligne); // nombre d'allumette aléatoire
-                    } while(2 * nb == jeu.get(ligne));
+                        nb = (int) (Math.random() * jeu.get(ligne)); // nombre d'allumette aléatoire
+                        System.out.println(nb);
+                    } while(nb == 0 || 2 * nb == jeu.get(ligne));
 
                     enlever(jeu, ligne, nb);
 
@@ -266,7 +267,31 @@ class GrundyRecPerdantes {
 
                             // Si UNE SEULE décomposition (à partir du jeu) est perdante (pour l'adversaire) alors le jeu n'EST PAS perdant.
                             // On renverra donc false : la situation (jeu) n'est PAS perdante.
-                            essai.stream().allMatch(tas -> tas > 2);
+
+                            // création d'une array list de array list qui va contenir les position perdantes après normalisation
+                            ArrayList<ArrayList<Integer>> normalisation= new ArrayList<>();
+
+                            // Boucle parcourant chaque position perdantes dans la liste
+                            for(int i = 0; i < posPerdantes.size(); i++) {
+                                ArrayList<Integer> position = posPerdantes.get(i);
+                                boolean estValide = false;
+
+                                // Verifie chaque valeur des tas avec une boucle classique et enlève les tas de et
+                                for(int j = 0; j < position.size(); j++) {
+                                    int numéro = position.get(j);
+                                    if (numéro != 1 && numéro != 2) {
+                                        estValide = true;
+                                    }
+                                }
+                                // Si la position est valide on l'ajoute dans la nouvelle array list
+                                if (estValide) {
+                                    normalisation.add(position);
+                                }
+                            }
+
+                            // Remplacement des anciennes positions perdantes par celles après normalisation
+                            posPerdantes.clear();
+                            posPerdantes.addAll(normalisation);
 
                             for (int i = 0; i < essai.size() - 1; i++) {
                                 int indexMin = i;
