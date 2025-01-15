@@ -446,7 +446,6 @@ class GrundyRecPerdEtGagn {
 
                 } else if ( estConnueGagnante(jeuNormalise) == true ) {
                     ret = false;
-                    System.out.println("Configuration gagnante déjà connue");
 
                 } else {
                     // création d'un jeu d'essais qui va examiner toutes les décompositions
@@ -534,7 +533,7 @@ class GrundyRecPerdEtGagn {
         int n = 3;
         jeu.add(n);
 
-        for (int i = 1 ; i <= 35 ; i++) {
+        for (int i = 1 ; i <= 43 ; i++) {
             cpt = 0;
 
             // Initialisation
@@ -552,8 +551,6 @@ class GrundyRecPerdEtGagn {
 
             // Affichage de cpt
             System.out.println("cpt : " + cpt);
-            System.out.println("posGagnantes = " + posGagnantes);
-            System.out.println("posPerdantes = " + posPerdantes);
 
             posPerdantes.clear();
             posGagnantes.clear();

@@ -457,7 +457,7 @@ class GrundyRecPerdantes {
         int n = 3;
         jeu.add(n);
 
-        for (int i = 1 ; i <= 22 ; i++) {
+        for (int i = 1 ; i <= 28 ; i++) {
             cpt = 0;
 
             // Initialisation
