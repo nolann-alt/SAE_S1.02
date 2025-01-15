@@ -534,7 +534,7 @@ class GrundyRecPerdEtGagn {
         int n = 3;
         jeu.add(n);
 
-        for (int i = 1 ; i <= 35 ; i++) {
+        for (int i = 1 ; i <= 23 ; i++) {
             cpt = 0;
 
             // Initialisation

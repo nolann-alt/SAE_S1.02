@@ -1,17 +1,21 @@
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 /**
  * Jeu de Grundy avec IA pour la machine
  * Ce programme ne contient que les méthodes permettant de tester jouerGagnant()
  * Cette version est brute sans aucune amélioration
- * @version 1.0
+ * @version 1.3
  * @author N.LESCOP - M.GOUELO
  */
-class GrundyRecBruteEff {
-
+class GrundyRecPerdantNeutre {
     /** Compteur pour mesurer l'efficacité de la méthode estGagnante() */
     long cpt;
+
+    // Liste des positions perdantes
+    ArrayList<ArrayList<Integer>> posPerdantes = new ArrayList<ArrayList<Integer>>();
+
+    // Liste des positions gagnantes
+    ArrayList<ArrayList<Integer>> posGagnantes = new ArrayList<ArrayList<Integer>>();
 
     /**
      * Méthode principal() du programme
@@ -26,7 +30,11 @@ class GrundyRecBruteEff {
             testJouerGagnant();
             testPremier();
             testSuivant();
+            testEstConnuePerdante();
+            testEstConnueGagnante();
+            testNormaliser();
             testEstGagnanteEfficacite();
+
 
         } else if (test == 'n' || test == 'N') {
             JoueurVsMachine();
@@ -41,7 +49,7 @@ class GrundyRecBruteEff {
 
         // Création joueur
         String joueur;
-        String machine = "Griddy";
+        String machine = "Grundy";
         String joueurActuel; // Qui enregistre qui doit jouer pendant le tour actuel
 
         do {
@@ -49,7 +57,7 @@ class GrundyRecBruteEff {
         } while(joueur.length() < 3);
 
         System.out.println("On détermine aléatoirement qui est ce qui commence...");
-        int PileFace = (int) Math.random();
+        int PileFace = (int) Math.random() + 1;
         if (PileFace == 0) {
             System.out.println(joueur + " joue en premier !");
             joueurActuel = joueur;
@@ -91,12 +99,13 @@ class GrundyRecBruteEff {
                 if (!gagner) { // La position n'est pas gagnante pour la machine ; Elle joue aléatoirement
 
                     do {
-                        ligne = (int) Math.random() * jeu.size(); // ligne aléatoire
+                        ligne = (int) (Math.random() * jeu.size()); // ligne aléatoire
                     } while(jeu.get(ligne) <= 2);
 
                     do {
-                        nb = (int) Math.random() * jeu.get(ligne); // nombre d'allumette aléatoire
-                    } while(2 * nb == jeu.get(ligne));
+                        nb = (int) (Math.random() * jeu.get(ligne)); // nombre d'allumette aléatoire
+                        System.out.println(nb);
+                    } while(nb == 0 || 2 * nb == jeu.get(ligne));
 
                     enlever(jeu, ligne, nb);
 
@@ -120,6 +129,238 @@ class GrundyRecBruteEff {
                 }
             }
         }
+    }
+
+    /**
+     * Cette methode renvoie vrai si et seulement si APRES normalisation de jeu, il y a égalité entre jeu et une situation connue comme
+     * perdante dans le tableau des situations perdantes.
+     *
+     * @param jeu plateau de jeu
+     * @return vrai si la situation est connue comme perdante, faux sinon
+     */
+    boolean estConnuePerdante ( ArrayList<Integer> jeu ) {
+        boolean connue = false;
+        if (jeu == null) {
+            System.err.println("jouerGagnant(): le paramètre jeu est null");
+
+        } else {
+            if (posPerdantes.contains(jeu)){
+                connue = true;
+            }
+        }
+        return connue;
+    }
+
+    /**
+     * Tests succincts de la méthode estConnuePerdante()
+     */
+    void testEstConnuePerdante() {
+        System.out.println();
+        System.out.println("*** testEstConnuePerdante() ***");
+
+        ArrayList<Integer> jeu1 = new ArrayList<Integer>();
+        jeu1.add(10);
+        jeu1.add(11);
+        ArrayList<Integer> jeu2 = new ArrayList<Integer>();
+        jeu2.add(11);
+        jeu2.add(10);
+
+        System.out.println("Test des cas normaux");
+        testCasEstConnuePerdante(jeu1, true);
+        testCasEstConnuePerdante(jeu2, false);
+    }
+
+    /**
+     * Test un cas de la méthode estConnuePerdante()
+     * @param jeu le plateau de jeu
+     * @param res le résultat attendu
+     */
+    void testCasEstConnuePerdante (ArrayList<Integer> jeu, boolean res) {
+        posPerdantes.clear();
+        // Affichage du test
+        System.out.print("estConnuePerdante (" + jeu.toString() + ") : ");
+        // Si la positon est connue, resExec est vrai
+
+        ArrayList<Integer> positionPerdante = new ArrayList<Integer>();
+        positionPerdante.add(10);
+        positionPerdante.add(11);
+        posPerdantes.add(positionPerdante);
+
+        boolean resExec = estConnuePerdante(jeu);
+        // Affichage du résultat
+        System.out.print(jeu.toString() + " " + resExec + " : ");
+        if (res == resExec) {
+            System.out.println("OK\n");
+        } else {
+            System.err.println("ERREUR\n");
+        }
+    }
+
+    /**
+     * Cette methode renvoie vrai si et seulement si APRES normalisation de jeu, il y a égalité entre jeu et une situation connue comme
+     * gagnante dans le tableau des situations gagnante posGagnante.
+     * @param jeu configuration de jeu normalisée
+     * @return vrai si cette configuration est connue faux sinon
+     */
+    boolean estConnueGagnante ( ArrayList<Integer> jeu ) {
+        boolean connue = false;
+        if (jeu == null) {
+            System.err.println("jouerGagnant(): le paramètre jeu est null");
+
+        } else {
+            if (posGagnantes.contains(jeu)){
+                connue = true;
+            }
+        }
+        return connue;
+    }
+
+    /**
+     * Tests de la methode estConnueGagnante()
+     */
+    void testEstConnueGagnante() {
+        System.out.println();
+        System.out.println("*** testEstConnueGagnante() ***");
+
+        ArrayList<Integer> jeu1 = new ArrayList<Integer>();
+        jeu1.add(3);
+        jeu1.add(5);
+        ArrayList<Integer> jeu2 = new ArrayList<Integer>();
+        jeu2.add(5);
+        jeu2.add(6);
+
+        System.out.println("Test des cas normaux");
+        testCasEstConnueGagnante(jeu1, true);
+        testCasEstConnueGagnante(jeu2, false);
+    }
+
+    /**
+     * Test un cas de la méthode estConnueGagnante()
+     * @param jeu le plateau de jeu
+     * @param res le résultat attendu
+     */
+    void testCasEstConnueGagnante (ArrayList<Integer> jeu, boolean res) {
+        posGagnantes.clear();
+        // Affichage du test
+        System.out.print("estConnueGagnante (" + jeu.toString() + ") : ");
+        // Si la positon est connue, resExec est vrai
+
+        ArrayList<Integer> positionGagnante = new ArrayList<Integer>();
+        positionGagnante.add(3);
+        positionGagnante.add(5);
+        posGagnantes.add(positionGagnante);
+
+        boolean resExec = estConnueGagnante(jeu);
+        // Affichage du résultat
+        System.out.print(jeu.toString() + " " + resExec + " : ");
+        if (res == resExec) {
+            System.out.println("OK\n");
+        } else {
+            System.err.println("ERREUR\n");
+        }
+    }
+
+    /**
+     * Normalise la configuration du jeu passer en paramètre
+     * @param jeu configuration actuelle du jeu
+     * @return jeu normaliser
+     */
+    ArrayList<Integer> normaliser(ArrayList<Integer> jeu) {
+        ArrayList<Integer> jeuNormalise = new ArrayList<>();
+
+        // Boucle normalisant l'arraylist jeuNormalise
+        for (int i = 0; i < jeu.size(); i++) {
+            if (jeu.get(i) > 2) {
+                jeuNormalise.add(jeu.get(i));
+            }
+        }
+
+        // On procède au tri de jeuNormalise
+        int min;
+        int temp;
+        for (int i = 0 ; i < jeuNormalise.size() ; i++) {
+            min = i;
+            for (int j = i ; j < jeuNormalise.size() ; j++) {
+                if (jeuNormalise.get(j) < jeuNormalise.get(min) ) {
+                    min = j;
+                }
+            }
+            // Echange des valeurs
+            temp = jeuNormalise.get(i);
+            jeuNormalise.set(i, jeuNormalise.get(min));
+            jeuNormalise.set(min, temp);
+        }
+        return jeuNormalise;
+    }
+
+    /**
+     * Test de la méthode normaliser()
+     */
+    void testNormaliser() {
+        System.out.println();
+        System.out.println("*** testNormaliser() ***");
+
+        ArrayList<Integer> jeu1 = new ArrayList<Integer>();
+        jeu1.add(10);
+        jeu1.add(11);
+        jeu1.add(2);
+        jeu1.add(1);
+        ArrayList<Integer> res1 = new ArrayList<Integer>();
+        res1.add(10);
+        res1.add(11);
+
+        ArrayList<Integer> jeu2 = new ArrayList<Integer>();
+        jeu2.add(10);
+        jeu2.add(11);
+        jeu2.add(2);
+        jeu2.add(3);
+        jeu2.add(1);
+        jeu2.add(5);
+        ArrayList<Integer> res2 = new ArrayList<Integer>();
+        res2.add(3);
+        res2.add(5);
+        res2.add(10);
+        res2.add(11);
+
+        System.out.println("Test des cas normaux");
+        testCasNormaliser(jeu1, res1);
+        testCasNormaliser(jeu2, res2);
+        System.out.println();
+    }
+
+    /**
+     * Test d'un cas de la méthode normaliser()
+     * @param jeu plateau de jeu
+     * @param res résultat attendu
+     */
+    void testCasNormaliser(ArrayList<Integer> jeu, ArrayList<Integer> res) {
+        // Affichage du test
+        System.out.print("normaliser (" + jeu.toString() + ") : ");
+        // Execution de la méthode
+        ArrayList<Integer> resExec = normaliser(jeu);
+        // Affichage du résultat
+        System.out.print(resExec.toString() + " : ");
+        if (res.equals(resExec)) {
+            System.out.println("OK\n");
+        } else {
+            System.err.println("ERREUR\n");
+        }
+    }
+
+    ArrayList<Integer> simplifier(ArrayList<Integer> jeu) {
+        ArrayList<Integer> jeuSimplifier = new ArrayList<>();
+
+        for (int i = 0 ; i < jeu.size() ; i++) {
+
+            // Cette arraylist va contenir un à un tous les tas de la collection jeu
+            ArrayList<Integer> tasParTas = new ArrayList<>();
+            tasParTas.add( jeu.get(i) );
+
+            if ( ! posPerdantes.contains( tasParTas ) ) {
+                jeuSimplifier.add( jeu.get(i) );
+            }
+        }
+        return jeuSimplifier;
     }
 
     /**
@@ -171,6 +412,7 @@ class GrundyRecBruteEff {
                     // certaine de gagner !!
                     jeu.clear();
                     gagnant = true;
+
                     // essai est recopié dans jeu car essai est la nouvelle situation de jeu après que la machine ait joué (gagnant)
                     for (int i = 0; i < essai.size(); i++) {
                         jeu.add(essai.get(i));
@@ -183,7 +425,6 @@ class GrundyRecBruteEff {
                 }
             }
         }
-
         return gagnant;
     }
 
@@ -210,41 +451,68 @@ class GrundyRecBruteEff {
             }
 
             else {
-                // création d'un jeu d'essais qui va examiner toutes les décompositions
-                // possibles à partir de jeu
-                ArrayList<Integer> essai = new ArrayList<Integer>(); // size = 0 !
+                // On normalise le jeu...
+                ArrayList<Integer> jeuNormalise = new ArrayList<>();
+                jeuNormalise = normaliser(jeu);
 
-                // toute première décomposition : enlever 1 allumette au premier tas qui possède
-                // au moins 3 allumettes, ligne = -1 signifie qu'il n'y a plus de tas d'au moins 3 allumettes
-                int ligne = premier(jeu, essai);
+                //... puis on le simplifie pour éviter encore d'autre calcul redondant
+                jeuNormalise = simplifier(jeuNormalise);
 
-                while ( (ligne != -1) && ret) {
+                // On vérifie si la configuration est déjà connue
+                if (estConnuePerdante(jeuNormalise) == true) {
+                    ret = true;
 
-                    cpt++; // compteur du nombre de tour de boucle pour la méthode efficacité
+                } else if ( estConnueGagnante(jeuNormalise) == true ) {
+                    ret = false;
+                    System.out.println("Configuration gagnante déjà connue");
 
-                    // mise en oeuvre de la règle numéro1
-                    // Une situation (ou position) est dite perdante si et seulement si TOUTES ses décompositions possibles
-                    // (c-à-d TOUTES les actions qui consistent à décomposer un tas en 2 tas inégaux) sont TOUTES gagnantes
-                    // (pour l’adversaire).
-                    // L'appel à "estPerdante" est RECURSIF.
+                } else {
+                    // création d'un jeu d'essais qui va examiner toutes les décompositions
+                    // possibles à partir de jeu
+                    ArrayList<Integer> essai = new ArrayList<Integer>(); // size = 0 !
 
-                    // Si "estPerdante(essai)" est true c'est équivalent à "estGagnante" est false, la décomposition
-                    // essai n'est donc pas gagnante, on sort du while et on renvoie false.
-                    if (estPerdante(essai) == true) {
+                    // toute première décomposition : enlever 1 allumette au premier tas qui possède
+                    // au moins 3 allumettes, ligne = -1 signifie qu'il n'y a plus de tas d'au moins 3 allumettes
+                    int ligne = premier(jeu, essai);
 
-                        // Si UNE SEULE décomposition (à partir du jeu) est perdante (pour l'adversaire) alors le jeu n'EST PAS perdant.
-                        // On renverra donc false : la situation (jeu) n'est PAS perdante.
-                        ret = false;
+                    while ( (ligne != -1) && ret) {
 
-                    } else {
-                        // génère la configuration d'essai suivante (c'est-à-dire UNE décomposition possible)
-                        // à partir du jeu, si ligne = -1 il n'y a plus de décomposition possible
-                        ligne = suivant(jeu, essai, ligne);
+                        cpt++; // compteur du nombre de tour de boucle pour la méthode efficacité
+
+                        // mise en oeuvre de la règle numéro1
+                        // Une situation (ou position) est dite perdante si et seulement si TOUTES ses décompositions possibles
+                        // (c-à-d TOUTES les actions qui consistent à décomposer un tas en 2 tas inégaux) sont TOUTES gagnantes
+                        // (pour l’adversaire).
+                        // L'appel à "estPerdante" est RECURSIF.
+
+                        // Si "estPerdante(essai)" est true c'est équivalent à "estGagnante" est false, la décomposition
+                        // essai n'est donc pas gagnante, on sort du while et on renvoie false.
+
+                        if (estPerdante(essai) == true) {
+
+                            // Si UNE SEULE décomposition (à partir du jeu) est perdante (pour l'adversaire) alors le jeu n'EST PAS perdant.
+                            // On renverra donc false : la situation (jeu) n'est PAS perdante.
+
+                            // Ajout dans posPerdante
+                            if (! posGagnantes.contains(jeuNormalise)) {
+                                posGagnantes.add(new ArrayList<>(jeuNormalise));
+                            }
+
+                            ret = false;
+
+                        } else {
+                            // Ajout dans posPerdante
+                            // génère la configuration d'essai suivante (c'est-à-dire UNE décomposition possible)
+                            // à partir du jeu, si ligne = -1 il n'y a plus de décomposition possible
+                            ligne = suivant(jeu, essai, ligne);
+                        }
                     }
+                }
+                if (ret) {
+                    posPerdantes.add(new ArrayList<>(jeuNormalise));
                 }
             }
         }
-
         return ret;
     }
 
@@ -266,13 +534,14 @@ class GrundyRecBruteEff {
     }
 
 
-    /**
+    /**import java.sql.SQLOutput;
      * Méthode testant l'efficacité de estGagnante()
      */
     void testEstGagnanteEfficacite() {
 
         System.out.println("*** résultats des tests de l'efficacité de estGagnante() : ***");
-
+        posPerdantes.clear();
+        posGagnantes.clear();
         // paramètres de estGagnante()
         ArrayList<Integer> jeu = new ArrayList<Integer>();
 
@@ -283,7 +552,7 @@ class GrundyRecBruteEff {
         int n = 3;
         jeu.add(n);
 
-        for (int i = 1 ; i <= 22 ; i++) {
+        for (int i = 1 ; i <= 23 ; i++) {
             cpt = 0;
 
             // Initialisation
@@ -294,14 +563,18 @@ class GrundyRecBruteEff {
             estGagnante(jeu);
             t2 = System.nanoTime();
 
-            // Calcul de la différence de temps
+            // Calcul de la difference de temps
             diffT = t2 - t1;
             System.out.println("n = " + n);
-            System.out.println("Temps = " + diffT /1000+ " us");
+            System.out.println("Temps = " + diffT /1000+ " microsecondes");
 
             // Affichage de cpt
             System.out.println("cpt : " + cpt);
-            System.out.println();
+            System.out.println("posGagnantes = " + posGagnantes);
+            System.out.println("posPerdantes = " + posPerdantes);
+
+            posPerdantes.clear();
+            posGagnantes.clear();
 
             n++;
         }

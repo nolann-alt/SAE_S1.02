@@ -5,7 +5,7 @@ import java.util.ArrayList;
  * Jeu de Grundy avec IA pour la machine
  * Ce programme ne contient que les méthodes permettant de tester jouerGagnant()
  * Cette version est brute sans aucune amélioration
- *
+ * @version 1.1
  * @author N.LESCOP - M.GOUELO
  */
 class GrundyRecPerdantes {
