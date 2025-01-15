@@ -1,3 +1,4 @@
+import java.net.Inet4Address;
 import java.util.ArrayList;
 
 /**
@@ -28,7 +29,9 @@ class GrundyRecPerdantes {
             testJouerGagnant();
             testPremier();
             testSuivant();
+            testEstConnuePerdante();
             testEstGagnanteEfficacite();
+
 
         } else if (test == 'n' || test == 'N') {
             JoueurVsMachine();
@@ -39,9 +42,6 @@ class GrundyRecPerdantes {
      * Boucle de jeu principale
      */
     void JoueurVsMachine() {
-        // Suppression des positions perdantes précédentes
-        posPerdantes.clear();
-
         System.out.println(" ---------- JEU GRUNDY ----------");
 
         // Création joueur
@@ -145,8 +145,74 @@ class GrundyRecPerdantes {
                 connue = true;
             }
         }
-
         return connue;
+    }
+
+    void testEstConnuePerdante() {
+        System.out.println();
+        System.out.println("*** testEstConnuePerdante() ***");
+
+        ArrayList<Integer> jeu1 = new ArrayList<Integer>();
+        jeu1.add(10);
+        jeu1.add(11);
+        ArrayList<Integer> jeu2 = new ArrayList<Integer>();
+        jeu2.add(10);
+        jeu2.add(11);
+        ArrayList<Integer> jeu3 = new ArrayList<Integer>();
+        jeu3.add(11);
+        jeu3.add(10);
+
+        System.out.println("Test des cas normaux");
+        testCasEstConnuePerdante(jeu1, true);
+        testCasEstConnuePerdante(jeu2, true);
+        testCasEstConnuePerdante(jeu3, false);
+    }
+
+    void testCasEstConnuePerdante (ArrayList<Integer> jeu, boolean res) {
+        // Affichage du test
+        System.out.print("estConnuePerdante (" + jeu.toString() + ") : ");
+        // Si la positon est connue, resExec est vrai
+        boolean resExec = estConnuePerdante(jeu);
+        // Affichage du résultat
+        System.out.print(jeu.toString() + " " + resExec + " : ");
+        if (res == resExec) {
+            System.out.println("OK\n");
+        } else {
+            System.err.println("ERREUR\n");
+        }
+    }
+
+    /**
+     * Normalise la configuration du jeu passer en paramètre
+     * @param jeu configuration actuelle du jeu
+     * @return jeu normaliser
+     */
+    ArrayList<Integer> normaliser(ArrayList<Integer> jeu) {
+        ArrayList<Integer> jeuNormalise = new ArrayList<>();
+
+        // Boucle normalisant l'arraylist jeuNormalise
+        for (int i = 0; i < jeu.size(); i++) {
+            if (jeu.get(i) > 2) {
+                jeuNormalise.add(jeu.get(i));
+            }
+        }
+
+        // On procède au tri de jeuNormalise
+        int min;
+        int temp;
+        for (int i = 0 ; i < jeuNormalise.size() ; i++) {
+            min = i;
+            for (int j = i ; j < jeuNormalise.size() ; j++) {
+                if (jeuNormalise.get(j) < jeuNormalise.get(min) ) {
+                    min = j;
+                }
+            }
+            // Echange des valeurs
+            temp = jeuNormalise.get(i);
+            jeuNormalise.set(i, jeuNormalise.get(min));
+            jeuNormalise.set(min, temp);
+        }
+        return jeuNormalise;
     }
 
     /**
@@ -237,12 +303,12 @@ class GrundyRecPerdantes {
             }
 
             else {
-                if (estConnuePerdante(jeu) == true) {
-                    System.out.println("Position perdante déjà connue.");
+                ArrayList<Integer> jeuNormalise = new ArrayList<>();
+                jeuNormalise = normaliser(jeu);
+                if (estConnuePerdante(jeuNormalise) == true) {
                     ret = true;
 
                 } else {
-
                     // création d'un jeu d'essais qui va examiner toutes les décompositions
                     // possibles à partir de jeu
                     ArrayList<Integer> essai = new ArrayList<Integer>(); // size = 0 !
@@ -269,43 +335,10 @@ class GrundyRecPerdantes {
                             // On renverra donc false : la situation (jeu) n'est PAS perdante.
 
                             // création d'une array list de array list qui va contenir les position perdantes après normalisation
-                            ArrayList<ArrayList<Integer>> normalisation= new ArrayList<>();
 
-                            // Boucle parcourant chaque position perdantes dans la liste
-                            for(int i = 0; i < posPerdantes.size(); i++) {
-                                ArrayList<Integer> position = posPerdantes.get(i);
-                                boolean estValide = false;
 
-                                // Verifie chaque valeur des tas avec une boucle classique et enlève les tas de et
-                                for(int j = 0; j < position.size(); j++) {
-                                    int numéro = position.get(j);
-                                    if (numéro != 1 && numéro != 2) {
-                                        estValide = true;
-                                    }
-                                }
-                                // Si la position est valide on l'ajoute dans la nouvelle array list
-                                if (estValide) {
-                                    normalisation.add(position);
-                                }
-                            }
-
-                            // Remplacement des anciennes positions perdantes par celles après normalisation
-                            posPerdantes.clear();
-                            posPerdantes.addAll(normalisation);
-
-                            for (int i = 0; i < essai.size() - 1; i++) {
-                                int indexMin = i;
-                                for (int j = i + 1; j < essai.size(); j++) {
-                                    if (essai.get(j) < essai.get(indexMin)) {
-                                        indexMin = j;
-                                    }
-                                }
-                                // Échanger les éléments
-                                int temp = essai.get(i);
-                                essai.set(i, essai.get(indexMin));
-                                essai.set(indexMin, temp);
-                            }
-
+                            // Ajout dans posPerdante
+                            essai = normaliser(essai);
                             if (! posPerdantes.contains(essai)) {
                                 posPerdantes.add(new ArrayList<>(essai));
                             }
@@ -369,14 +402,17 @@ class GrundyRecPerdantes {
             estGagnante(jeu);
             t2 = System.nanoTime();
 
+            // Calcul de la difference de temps
             diffT = t2 - t1;
             System.out.println("n = " + n);
-            System.out.println("Temps = " + diffT + " ns");
+            System.out.println("Temps = " + diffT /1000+ " microsecondes");
 
-            // La complexité de l'algorithme est 2 puissance n. Pour chaque tas on rajoute les décomposition en sous tas qui se décompose également etc...
-            // On arrive sur une configuration tel que 2 * 2 * 2 * 2 * 2.....
-            System.out.println("cpt / n = " + (double) cpt / Math.pow(2, n));
+            // Affichage de cpt
+            System.out.println("cpt : " + cpt);
+            System.out.println(posPerdantes);
             System.out.println();
+
+            posPerdantes.clear();
 
             n++;
         }

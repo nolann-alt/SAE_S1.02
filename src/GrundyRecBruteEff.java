@@ -294,13 +294,13 @@ class GrundyRecBruteEff {
             estGagnante(jeu);
             t2 = System.nanoTime();
 
+            // Calcul de la différence de temps
             diffT = t2 - t1;
             System.out.println("n = " + n);
-            System.out.println("Temps = " + diffT + " ns");
+            System.out.println("Temps = " + diffT /1000+ " us");
 
-            // La complexité de l'algorithme est 2 puissance n. Pour chaque tas on rajoute les décomposition en sous tas qui se décompose également etc...
-            // On arrive sur une configuration tel que 2 * 2 * 2 * 2 * 2.....
-            System.out.println("cpt / n = " + (double) cpt / Math.pow(2, n));
+            // Affichage de cpt
+            System.out.println("cpt : " + cpt);
             System.out.println();
 
             n++;
