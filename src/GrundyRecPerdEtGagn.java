@@ -439,6 +439,8 @@ class GrundyRecPerdEtGagn {
                 // On normalise le jeu
                 ArrayList<Integer> jeuNormalise = new ArrayList<>();
                 jeuNormalise = normaliser(jeu);
+
+                // On vérifie si la configuration est déjà connue
                 if (estConnuePerdante(jeuNormalise) == true) {
                     ret = true;
 
