@@ -5,16 +5,18 @@ import java.util.ArrayList;
  * Jeu de Grundy avec IA pour la machine
  * Ce programme ne contient que les méthodes permettant de tester jouerGagnant()
  * Cette version est brute sans aucune amélioration
- *
+ * @version 1.2
  * @author N.LESCOP - M.GOUELO
  */
-class GrundyRecPerdantes {
-
+class GrundyRecPerdEtGagn {
     /** Compteur pour mesurer l'efficacité de la méthode estGagnante() */
     long cpt;
 
-    /** Liste des positions perdantes */
+    // Liste des positions perdantes
     ArrayList<ArrayList<Integer>> posPerdantes = new ArrayList<ArrayList<Integer>>();
+
+    // Liste des positions gagnantes
+    ArrayList<ArrayList<Integer>> posGagnantes = new ArrayList<ArrayList<Integer>>();
 
     /**
      * Méthode principal() du programme
@@ -30,6 +32,7 @@ class GrundyRecPerdantes {
             testPremier();
             testSuivant();
             testEstConnuePerdante();
+            testEstConnueGagnante();
             testNormaliser();
             testEstGagnanteEfficacite();
 
@@ -150,7 +153,7 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Test de la méthode estConnuePerdante()
+     * Tests succincts de la méthode estConnuePerdante()
      */
     void testEstConnuePerdante() {
         System.out.println();
@@ -169,9 +172,9 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Test d'un cas de la méthode estConnuePerdante()
-     * @param jeu plateau de jeu
-     * @param res résultat attendu
+     * Test un cas de la méthode estConnuePerdante()
+     * @param jeu le plateau de jeu
+     * @param res le résultat attendu
      */
     void testCasEstConnuePerdante (ArrayList<Integer> jeu, boolean res) {
         posPerdantes.clear();
@@ -185,6 +188,70 @@ class GrundyRecPerdantes {
         posPerdantes.add(positionPerdante);
 
         boolean resExec = estConnuePerdante(jeu);
+        // Affichage du résultat
+        System.out.print(jeu.toString() + " " + resExec + " : ");
+        if (res == resExec) {
+            System.out.println("OK\n");
+        } else {
+            System.err.println("ERREUR\n");
+        }
+    }
+
+    /**
+     * Cette methode renvoie vrai si et seulement si APRES normalisation de jeu, il y a égalité entre jeu et une situation connue comme
+     * gagnante dans le tableau des situations gagnante posGagnante.
+     * @param jeu configuration de jeu normalisée
+     * @return vrai si cette configuration est connue faux sinon
+     */
+    boolean estConnueGagnante ( ArrayList<Integer> jeu ) {
+        boolean connue = false;
+        if (jeu == null) {
+            System.err.println("jouerGagnant(): le paramètre jeu est null");
+
+        } else {
+            if (posGagnantes.contains(jeu)){
+                connue = true;
+            }
+        }
+        return connue;
+    }
+
+    /**
+     * Tests de la methode estConnueGagnante()
+     */
+    void testEstConnueGagnante() {
+        System.out.println();
+        System.out.println("*** testEstConnueGagnante() ***");
+
+        ArrayList<Integer> jeu1 = new ArrayList<Integer>();
+        jeu1.add(3);
+        jeu1.add(5);
+        ArrayList<Integer> jeu2 = new ArrayList<Integer>();
+        jeu2.add(5);
+        jeu2.add(6);
+
+        System.out.println("Test des cas normaux");
+        testCasEstConnueGagnante(jeu1, true);
+        testCasEstConnueGagnante(jeu2, false);
+    }
+
+    /**
+     * Test un cas de la méthode estConnueGagnante()
+     * @param jeu le plateau de jeu
+     * @param res le résultat attendu
+     */
+    void testCasEstConnueGagnante (ArrayList<Integer> jeu, boolean res) {
+        posGagnantes.clear();
+        // Affichage du test
+        System.out.print("estConnueGagnante (" + jeu.toString() + ") : ");
+        // Si la positon est connue, resExec est vrai
+
+        ArrayList<Integer> positionGagnante = new ArrayList<Integer>();
+        positionGagnante.add(3);
+        positionGagnante.add(5);
+        posGagnantes.add(positionGagnante);
+
+        boolean resExec = estConnueGagnante(jeu);
         // Affichage du résultat
         System.out.print(jeu.toString() + " " + resExec + " : ");
         if (res == resExec) {
@@ -330,6 +397,7 @@ class GrundyRecPerdantes {
                     // certaine de gagner !!
                     jeu.clear();
                     gagnant = true;
+
                     // essai est recopié dans jeu car essai est la nouvelle situation de jeu après que la machine ait joué (gagnant)
                     for (int i = 0; i < essai.size(); i++) {
                         jeu.add(essai.get(i));
@@ -342,7 +410,6 @@ class GrundyRecPerdantes {
                 }
             }
         }
-
         return gagnant;
     }
 
@@ -374,6 +441,10 @@ class GrundyRecPerdantes {
                 if (estConnuePerdante(jeuNormalise) == true) {
                     ret = true;
 
+                } else if ( estConnueGagnante(jeuNormalise) == true ) {
+                    ret = false;
+                    System.out.println("Configuration gagnante déjà connue");
+
                 } else {
                     // création d'un jeu d'essais qui va examiner toutes les décompositions
                     // possibles à partir de jeu
@@ -400,9 +471,6 @@ class GrundyRecPerdantes {
                             // Si UNE SEULE décomposition (à partir du jeu) est perdante (pour l'adversaire) alors le jeu n'EST PAS perdant.
                             // On renverra donc false : la situation (jeu) n'est PAS perdante.
 
-                            // création d'une array list de array list qui va contenir les position perdantes après normalisation
-
-
                             // Ajout dans posPerdante
                             essai = normaliser(essai);
                             if (! posPerdantes.contains(essai)) {
@@ -411,6 +479,12 @@ class GrundyRecPerdantes {
                             ret = false;
 
                         } else {
+                            // Ajout dans posPerdante
+                            essai = normaliser(essai);
+                            if (! posGagnantes.contains(essai)) {
+                                posGagnantes.add(new ArrayList<>(essai));
+                            }
+
                             // génère la configuration d'essai suivante (c'est-à-dire UNE décomposition possible)
                             // à partir du jeu, si ligne = -1 il n'y a plus de décomposition possible
                             ligne = suivant(jeu, essai, ligne);
@@ -447,6 +521,7 @@ class GrundyRecPerdantes {
 
         System.out.println("*** résultats des tests de l'efficacité de estGagnante() : ***");
         posPerdantes.clear();
+        posGagnantes.clear();
         // paramètres de estGagnante()
         ArrayList<Integer> jeu = new ArrayList<Integer>();
 
@@ -475,9 +550,11 @@ class GrundyRecPerdantes {
 
             // Affichage de cpt
             System.out.println("cpt : " + cpt);
-            System.out.println();
+            System.out.println("posGagnantes = " + posGagnantes);
+            System.out.println("posPerdantes = " + posPerdantes);
 
             posPerdantes.clear();
+            posGagnantes.clear();
 
             n++;
         }
