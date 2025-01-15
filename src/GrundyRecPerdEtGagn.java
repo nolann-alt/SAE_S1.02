@@ -466,30 +466,29 @@ class GrundyRecPerdEtGagn {
 
                         // Si "estPerdante(essai)" est true c'est équivalent à "estGagnante" est false, la décomposition
                         // essai n'est donc pas gagnante, on sort du while et on renvoie false.
+
                         if (estPerdante(essai) == true) {
 
                             // Si UNE SEULE décomposition (à partir du jeu) est perdante (pour l'adversaire) alors le jeu n'EST PAS perdant.
                             // On renverra donc false : la situation (jeu) n'est PAS perdante.
 
                             // Ajout dans posPerdante
-                            essai = normaliser(essai);
-                            if (! posPerdantes.contains(essai)) {
-                                posPerdantes.add(new ArrayList<>(essai));
+                            if (! posGagnantes.contains(jeuNormalise)) {
+                                posGagnantes.add(new ArrayList<>(jeuNormalise));
                             }
+
                             ret = false;
 
                         } else {
                             // Ajout dans posPerdante
-                            essai = normaliser(essai);
-                            if (! posGagnantes.contains(essai)) {
-                                posGagnantes.add(new ArrayList<>(essai));
-                            }
-
                             // génère la configuration d'essai suivante (c'est-à-dire UNE décomposition possible)
                             // à partir du jeu, si ligne = -1 il n'y a plus de décomposition possible
                             ligne = suivant(jeu, essai, ligne);
                         }
                     }
+                }
+                if (ret) {
+                    posPerdantes.add(new ArrayList<>(jeuNormalise));
                 }
             }
         }
@@ -532,7 +531,7 @@ class GrundyRecPerdEtGagn {
         int n = 3;
         jeu.add(n);
 
-        for (int i = 1 ; i <= 22 ; i++) {
+        for (int i = 1 ; i <= 35 ; i++) {
             cpt = 0;
 
             // Initialisation
