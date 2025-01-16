@@ -62,7 +62,7 @@ class GrundyRecGplusGequalsP {
         String joueurActuel; // Qui enregistre qui doit jouer pendant le tour actuel
 
         do {
-            joueur = SimpleInput.getString("Quel est votre pseudo : ");
+            joueur = SimpleInput.getString("Quel est votre pseudo (min 3 caractères) : ");
         } while(joueur.length() < 3);
 
         System.out.println("On détermine aléatoirement qui est ce qui commence...");
@@ -90,7 +90,7 @@ class GrundyRecGplusGequalsP {
             // Si c'est au joueur de jouer...
             if (joueurActuel == joueur) {
                 do {
-                    ligne = SimpleInput.getInt("Sur quel tas voulez-vous agir : ");
+                    ligne = SimpleInput.getInt("Sur quel tas voulez-vous agir (0 à 6) : ");
                 } while(ligne < 0 || ligne >= jeu.size() || jeu.get(ligne) <= 2);
 
                 do {
@@ -113,7 +113,6 @@ class GrundyRecGplusGequalsP {
 
                     do {
                         nb = (int) (Math.random() * jeu.get(ligne)); // nombre d'allumette aléatoire
-                        System.out.println(nb);
                     } while(nb == 0 || 2 * nb == jeu.get(ligne));
 
                     enlever(jeu, ligne, nb);
@@ -639,7 +638,7 @@ class GrundyRecGplusGequalsP {
         int n = 3;
         jeu.add(n);
 
-        for (int i = 1 ; i <= 78 ; i++) {
+        for (int i = 1 ; i <= 81 ; i++) {
             cpt = 0;
 
             // Initialisation
@@ -657,6 +656,7 @@ class GrundyRecGplusGequalsP {
 
             // Affichage de cpt
             System.out.println("cpt : " + cpt);
+            System.out.println();
 
             posPerdantes.clear();
             posGagnantes.clear();

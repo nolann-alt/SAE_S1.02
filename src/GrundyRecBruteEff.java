@@ -45,7 +45,7 @@ class GrundyRecBruteEff {
         String joueurActuel; // Qui enregistre qui doit jouer pendant le tour actuel
 
         do {
-            joueur = SimpleInput.getString("Quel est votre pseudo : ");
+            joueur = SimpleInput.getString("Quel est votre pseudo (min 3 caractères) : ");
         } while(joueur.length() < 3);
 
         System.out.println("On détermine aléatoirement qui est ce qui commence...");
@@ -73,7 +73,7 @@ class GrundyRecBruteEff {
             // Si c'est au joueur de jouer...
             if (joueurActuel == joueur) {
                 do {
-                    ligne = SimpleInput.getInt("Sur quel tas voulez-vous agir : ");
+                    ligne = SimpleInput.getInt("Sur quel tas voulez-vous agir (0 à 6) : ");
                 } while(ligne < 0 || ligne >= jeu.size() || jeu.get(ligne) <= 2);
 
                 do {
