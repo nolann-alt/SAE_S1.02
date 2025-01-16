@@ -2,23 +2,24 @@ import java.net.Inet4Address;
 import java.util.ArrayList;
 
 /**
- * Jeu de Grundy avec IA pour la machine
- * Ce programme ne contient que les méthodes permettant de tester jouerGagnant()
- * Cette version est brute sans aucune amélioration
+ * Grundy game with AI for the machine
+ * This version1, which is more efficient than version0, is based on a fairly obvious observation: there's no point
+ * to recalculate the decompositions of a heap (or situation) that we know (because we've already evaluated it) is a loser anyway.
+ * These losing heaps (situations) are stored in an array (ArrayList), which you simply need to consult for each heap and situation
+ * before starting a recursive decomposition (which serves no purpose except to waste time).
  *
+ * @version 1.1
  * @author N.LESCOP - M.GOUELO
  */
 class GrundyRecPerdantes {
 
-    /** Compteur pour mesurer l'efficacité de la méthode estGagnante() */
+    /** Counter to measure the efficiency of the estGagnante() method. */
     long cpt;
 
-    /** Liste des positions perdantes */
+    /** List of losing positions. */
     ArrayList<ArrayList<Integer>> posPerdantes = new ArrayList<ArrayList<Integer>>();
 
-    /**
-     * Méthode principal() du programme
-     */
+    /** Main method of the program. */
     void principal() {
         char test;
         do {
@@ -39,9 +40,7 @@ class GrundyRecPerdantes {
         }
     }
 
-    /**
-     * Boucle de jeu principale
-     */
+    /** Main game loop. */
     void JoueurVsMachine() {
         System.out.println(" ---------- JEU GRUNDY ----------");
 
@@ -130,11 +129,11 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Cette methode renvoie vrai si et seulement si APRES normalisation de jeu, il y a égalité entre jeu et une situation connue comme
-     * perdante dans le tableau des situations perdantes.
+     * This method returns true if and only if, AFTER normalizing the game, there is a match between the game
+     * and a situation known to be losing in the list of losing situations.
      *
-     * @param jeu plateau de jeu
-     * @return vrai si la situation est connue comme perdante, faux sinon
+     * @param jeu game board
+     * @return true if the situation is known to be losing, false otherwise
      */
     boolean estConnuePerdante ( ArrayList<Integer> jeu ) {
         boolean connue = false;
@@ -149,9 +148,7 @@ class GrundyRecPerdantes {
         return connue;
     }
 
-    /**
-     * Test de la méthode estConnuePerdante()
-     */
+    /** Test for the estConnuePerdante() method. */
     void testEstConnuePerdante() {
         System.out.println();
         System.out.println("*** testEstConnuePerdante() ***");
@@ -169,9 +166,9 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Test d'un cas de la méthode estConnuePerdante()
-     * @param jeu plateau de jeu
-     * @param res résultat attendu
+     * Test a specific case of the estConnuePerdante() method.
+     * @param jeu game board
+     * @param res expected result
      */
     void testCasEstConnuePerdante (ArrayList<Integer> jeu, boolean res) {
         posPerdantes.clear();
@@ -195,9 +192,9 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Normalise la configuration du jeu passer en paramètre
-     * @param jeu configuration actuelle du jeu
-     * @return jeu normaliser
+     * Normalizes the given game configuration.
+     * @param jeu current game configuration
+     * @return normalized game configuration
      */
     ArrayList<Integer> normaliser(ArrayList<Integer> jeu) {
         ArrayList<Integer> jeuNormalise = new ArrayList<>();
@@ -227,9 +224,7 @@ class GrundyRecPerdantes {
         return jeuNormalise;
     }
 
-    /**
-     * Test de la méthode normaliser()
-     */
+    /** Test for the estConnuePerdante() method. */
     void testNormaliser() {
         System.out.println();
         System.out.println("*** testNormaliser() ***");
@@ -263,9 +258,9 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Test d'un cas de la méthode normaliser()
-     * @param jeu plateau de jeu
-     * @param res résultat attendu
+     * Test a specific case of the estConnuePerdante() method.
+     * @param jeu game board
+     * @param res expected result
      */
     void testCasNormaliser(ArrayList<Integer> jeu, ArrayList<Integer> res) {
         // Affichage du test
@@ -282,8 +277,8 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Créer un affichage du jeu dans le terminal
-     * @param jeu plateau de jeu avec les tas d'allumettes
+     * Displays the game board in the terminal.
+     * @param jeu game board with matchstick piles
      */
     void afficher(ArrayList<Integer> jeu) {
 
@@ -300,10 +295,10 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Joue le coup gagnant s'il existe
+     * Plays the winning move if it exists.
      *
-     * @param jeu plateau de jeu
-     * @return vrai s'il y a un coup gagnant, faux sinon
+     * @param jeu game board
+     * @return true if there is a winning move, false otherwise
      */
     boolean jouerGagnant(ArrayList<Integer> jeu) {
         boolean gagnant = false;
@@ -347,11 +342,11 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Méthode RECURSIVE qui indique si la configuration (du jeu actuel ou jeu d'essai) est perdante.
-     * Cette méthode est utilisée par la machine pour savoir si l'adversaire peut perdre (à 100%).
+     * RECURSIVE method that determines if the configuration (current or test game) is losing.
+     * This method is used by the machine to determine if the opponent is certain to lose.
      *
-     * @param jeu plateau de jeu actuel (l'état du jeu à un certain moment au cours de la partie)
-     * @return vrai si la configuration (du jeu) est perdante, faux sinon
+     * @param jeu current game board (state of the game at a given point during play)
+     * @return true if the configuration is losing, false otherwise
      */
     boolean estPerdante(ArrayList<Integer> jeu) {
 
@@ -423,11 +418,11 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Indique si la configuration est gagnante.
-     * Méthode qui appelle simplement "estPerdante".
+     * Indicates whether the configuration is winning.
+     * This method simply calls "estPerdante".
      *
-     * @param jeu plateau de jeu
-     * @return vrai si la configuration est gagnante, faux sinon
+     * @param jeu game board
+     * @return true if the configuration is winning, false otherwise
      */
     boolean estGagnante(ArrayList<Integer> jeu) {
         boolean ret = false;
@@ -439,10 +434,7 @@ class GrundyRecPerdantes {
         return ret;
     }
 
-
-    /**import java.sql.SQLOutput;
-     * Méthode testant l'efficacité de estGagnante()
-     */
+    /** Method testing the efficiency of estGagnante(). */
     void testEstGagnanteEfficacite() {
 
         System.out.println("*** résultats des tests de l'efficacité de estGagnante() : ***");
@@ -484,9 +476,7 @@ class GrundyRecPerdantes {
     }
 
 
-    /**
-     * Tests succincts de la méthode joueurGagnant()
-     */
+    /** Brief tests for the joueurGagnant() method. */
     void testJouerGagnant() {
         System.out.println();
         System.out.println("*** testJouerGagnant() ***");
@@ -503,11 +493,11 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Test d'un cas de la méthode jouerGagnant()
+     * Tests a specific case of the jouerGagnant() method.
      *
-     * @param jeu le plateau de jeu
-     * @param resJeu le plateau de jeu après avoir joué gagnant
-     * @param res le résultat attendu par jouerGagnant
+     * @param jeu game board
+     * @param resJeu game board after playing a winning move
+     * @param res expected result for jouerGagnant
      */
     void testCasJouerGagnant(ArrayList<Integer> jeu, ArrayList<Integer> resJeu, boolean res) {
         // Arrange
@@ -527,13 +517,13 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Divise en deux tas les allumettes d'une ligne de jeu (1 ligne = 1 tas).
-     * Le nouveau tas se place nécessairement en fin de tableau.
-     * Le tas qui est divisé diminue du nombre d'allumettes enlevées.
+     * Splits the matchsticks in a pile into two piles.
+     * The new pile is necessarily placed at the end of the list.
+     * The pile that is split decreases by the number of matchsticks removed.
      *
-     * @param jeu   tableau des allumettes par ligne
-     * @param ligne tas pour lequel les allumettes doivent être séparées
-     * @param nb    nombre d'allumettes RETIREE du tas (ligne) lors de la séparation
+     * @param jeu list of matchstick piles
+     * @param ligne pile to split
+     * @param nb number of matchsticks REMOVED from the pile (ligne) during the split
      */
     void enlever ( ArrayList<Integer> jeu, int ligne, int nb ) {
         // traitement des erreurs
@@ -557,10 +547,10 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Teste s'il est possible de séparer un des tas
+     * Tests whether it is possible to split one of the piles.
      *
-     * @param jeu      plateau de jeu
-     * @return vrai s'il existe au moins un tas de 3 allumettes ou plus, faux sinon
+     * @param jeu game board
+     * @return true if there is at least one pile with 3 or more matchsticks, false otherwise
      */
     boolean estPossible(ArrayList<Integer> jeu) {
         boolean ret = false;
@@ -579,11 +569,11 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Crée une toute première configuration d'essai à partir du jeu
+     * Creates the very first test configuration from the game board.
      *
-     * @param jeu      plateau de jeu
-     * @param jeuEssai nouvelle configuration du jeu
-     * @return le numéro du tas divisé en deux ou (-1) si il n'y a pas de tas d'au moins 3 allumettes
+     * @param jeu game board
+     * @param jeuEssai new game configuration
+     * @return the number of the pile split into two, or (-1) if there are no piles with at least 3 matchsticks
      */
     int premier(ArrayList<Integer> jeu, ArrayList<Integer> jeuEssai) {
 
@@ -632,9 +622,7 @@ class GrundyRecPerdantes {
         return numTas;
     }
 
-    /**
-     * Tests succincts de la méthode premier()
-     */
+    /** Brief tests for the premier() method. */
     void testPremier() {
         System.out.println();
         System.out.println("*** testPremier()");
@@ -651,10 +639,11 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Test un cas de la méthode testPremier
-     * @param jeu le plateau de jeu
-     * @param ligne le numéro du tas séparé en premier
-     * @param res le plateau de jeu après une première séparation
+     * Tests a specific case of the premier() method.
+     *
+     * @param jeu game board
+     * @param ligne the number of the first pile split
+     * @param res the game board after the first split
      */
     void testCasPremier(ArrayList<Integer> jeu, int ligne, ArrayList<Integer> res) {
         // Arrange
@@ -673,12 +662,12 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Génère la configuration d'essai suivante (c'est-à-dire UNE décomposition possible)
+     * Generates the next test configuration (i.e., one possible split).
      *
-     * @param jeu      plateau de jeu
-     * @param jeuEssai configuration d'essai du jeu après séparation
-     * @param ligne    le numéro du tas qui est le dernier à avoir été séparé
-     * @return le numéro du tas divisé en deux pour la nouvelle configuration, -1 si plus aucune décomposition n'est possible
+     * @param jeu game board
+     * @param jeuEssai test configuration of the game after splitting
+     * @param ligne the number of the last pile that was split
+     * @return the number of the pile split into two for the new configuration, or -1 if no more splits are possible
      */
     int suivant(ArrayList<Integer> jeu, ArrayList<Integer> jeuEssai, int ligne) {
 
@@ -742,9 +731,7 @@ class GrundyRecPerdantes {
         return numTas;
     }
 
-    /**
-     * Tests succincts de la méthode suivant()
-     */
+    /** Brief tests for the suivant() method. */
     void testSuivant() {
         System.out.println();
         System.out.println("*** testSuivant() ****");
@@ -793,13 +780,13 @@ class GrundyRecPerdantes {
     }
 
     /**
-     * Test un cas de la méthode suivant
+     * Tests a specific case of the suivant() method.
      *
-     * @param jeu le plateau de jeu
-     * @param jeuEssai le plateau de jeu obtenu après avoir séparé un tas
-     * @param ligne le numéro du tas qui est le dernier à avoir été séparé
-     * @param resJeu est le jeuEssai attendu après séparation
-     * @param resLigne est le numéro attendu du tas qui est séparé
+     * @param jeu game board
+     * @param jeuEssai game board obtained after splitting a pile
+     * @param ligne the number of the last pile that was split
+     * @param resJeu expected test configuration after splitting
+     * @param resLigne expected number of the pile that was split
      */
     void testCasSuivant(ArrayList<Integer> jeu, ArrayList<Integer> jeuEssai, int ligne, ArrayList<Integer> resJeu, int resLigne) {
         // Arrange

@@ -349,6 +349,11 @@ class GrundyRecPerdantNeutre {
         }
     }
 
+    /**
+     * Simplifie le jeu en retirant les configurations perdantes
+     * @param jeu plateau de jeu normalisé
+     * @return jeu simplifié
+     */
     ArrayList<Integer> simplifier(ArrayList<Integer> jeu) {
         ArrayList<Integer> jeuSimplifier = new ArrayList<>();
 
@@ -373,12 +378,13 @@ class GrundyRecPerdantNeutre {
         System.out.println("*** testSimplifier() ***");
 
         ArrayList<Integer> jeu1 = new ArrayList<Integer>();
-        jeu1.add(5);
         jeu1.add(3);
+        jeu1.add(5);
         jeu1.add(2);
         jeu1.add(1);
         jeu1.add(4);
         jeu1.add(7);
+        jeu1 = normaliser(jeu1);
         ArrayList<Integer> res1 = new ArrayList<Integer>();
         res1.add(3);
         res1.add(5);
@@ -399,9 +405,12 @@ class GrundyRecPerdantNeutre {
         System.out.print("simplifier (" + jeu.toString() + ") : ");
 
         ArrayList<Integer> positionPerdante = new ArrayList<Integer>();
-        positionPerdante.add(4);
-        positionPerdante.add(7);
-        posPerdantes.add(positionPerdante);
+        ArrayList<Integer> val1 = new ArrayList<Integer>();
+        ArrayList<Integer> val2 = new ArrayList<Integer>();
+        val1.add(4);
+        val2.add(7);
+        posPerdantes.add(val1);
+        posPerdantes.add(val2);
 
         // Execution de la méthode
         ArrayList<Integer> resExec = simplifier(jeu);
@@ -412,6 +421,7 @@ class GrundyRecPerdantNeutre {
         } else {
             System.err.println("ERREUR\n");
         }
+        posPerdantes.clear();
     }
 
     /**
@@ -515,7 +525,6 @@ class GrundyRecPerdantNeutre {
 
                 } else if ( estConnueGagnante(jeuNormalise) == true ) {
                     ret = false;
-                    System.out.println("Configuration gagnante déjà connue");
 
                 } else {
                     // création d'un jeu d'essais qui va examiner toutes les décompositions
@@ -603,7 +612,7 @@ class GrundyRecPerdantNeutre {
         int n = 3;
         jeu.add(n);
 
-        for (int i = 1 ; i <= 23 ; i++) {
+        for (int i = 1 ; i <= 46 ; i++) {
             cpt = 0;
 
             // Initialisation
@@ -621,8 +630,7 @@ class GrundyRecPerdantNeutre {
 
             // Affichage de cpt
             System.out.println("cpt : " + cpt);
-            System.out.println("posGagnantes = " + posGagnantes);
-            System.out.println("posPerdantes = " + posPerdantes);
+            System.out.println();
 
             posPerdantes.clear();
             posGagnantes.clear();

@@ -1,14 +1,14 @@
-import java.net.Inet4Address;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
  * Jeu de Grundy avec IA pour la machine
  * Ce programme ne contient que les méthodes permettant de tester jouerGagnant()
  * Cette version est brute sans aucune amélioration
- * @version 1.2
+ * @version 1.4
  * @author N.LESCOP - M.GOUELO
  */
-class GrundyRecPerdEtGagn {
+class GrundyRecGplusGequalsP {
     /** Compteur pour mesurer l'efficacité de la méthode estGagnante() */
     long cpt;
 
@@ -17,6 +17,13 @@ class GrundyRecPerdEtGagn {
 
     // Liste des positions gagnantes
     ArrayList<ArrayList<Integer>> posGagnantes = new ArrayList<ArrayList<Integer>>();
+
+    // Liste de types
+    int[] type = new int[] {0, 0, 0, 1, 0, 2, 1, 0, 2, 1, 0,
+                        2, 1, 3, 2, 1, 3, 2, 4, 3, 0,
+                        4, 3, 0, 4, 3, 0, 4, 1, 2, 3,
+                        1, 2, 4, 1, 2, 6, 1, 2, 4, 1,
+                        5, 4, 1, 5, 4, 1, 5, 4, 1, 0};
 
     /**
      * Méthode principal() du programme
@@ -34,6 +41,7 @@ class GrundyRecPerdEtGagn {
             testEstConnuePerdante();
             testEstConnueGagnante();
             testNormaliser();
+            testSimplifier();
             testEstGagnanteEfficacite();
 
 
@@ -349,6 +357,99 @@ class GrundyRecPerdEtGagn {
     }
 
     /**
+     * Simplifie le jeu en retirant les configurations perdantes
+     * @param jeu plateau de jeu
+     * @return jeu simplifié
+     */
+    ArrayList<Integer> simplifier(ArrayList<Integer> jeu) {
+        ArrayList<Integer> jeuSimplifier = new ArrayList<>();
+        ArrayList<Integer> aSupprimer = new ArrayList<>();
+        ArrayList<Integer> cloneJeuSimplifier = new ArrayList<>();
+
+        for (int i = 0 ; i < jeu.size() ; i++) {
+
+            // Cette arraylist va contenir un à un tous les tas de la collection jeu
+            ArrayList<Integer> tasParTas = new ArrayList<>();
+            tasParTas.add( jeu.get(i) );
+
+            if ( ! posPerdantes.contains( tasParTas ) ) {
+                jeuSimplifier.add( jeu.get(i) );
+                cloneJeuSimplifier.add( jeu.get(i) );
+            }
+        }
+
+        // On procède à la simplification de la Version 4 en comparant chaque élément entre eux
+
+        for (int i = 0 ; i < jeuSimplifier.size() ; i++) {
+            for (int j = 0 ; j < jeuSimplifier.size() ; i++) {
+                if (( !aSupprimer.contains(i) ) && ( !aSupprimer.contains(j) )) {
+                    if (i != j && type[jeuSimplifier.get(i)] == type[jeuSimplifier.get(j)]) {
+                        aSupprimer.add(i);
+                        aSupprimer.add(j);
+                    }
+                }
+            }
+        }
+        // A supprimer contient les indices des valeurs a supprimer dans JeuSimplifier
+        // Pour la supression des valeur on a besoins d'un clone de jeuSimplifier
+        for (int i = 0 ; i < aSupprimer.size() ; i++) {
+            jeuSimplifier.remove( aSupprimer.get(i) );
+        }
+
+        return jeuSimplifier;
+    }
+
+    /**
+     * Test de la méthode simplifier()
+     */
+    void testSimplifier() {
+        System.out.println();
+        System.out.println("*** testSimplifier() ***");
+
+        ArrayList<Integer> jeu1 = new ArrayList<Integer>();
+        jeu1.add(3);
+        jeu1.add(5);
+        jeu1.add(2);
+        jeu1.add(1);
+        jeu1.add(4);
+        jeu1.add(7);
+        ArrayList<Integer> res1 = new ArrayList<Integer>();
+        res1.add(3);
+        res1.add(5);
+
+        System.out.println("Test des cas normaux");
+        testCasSimplifier(jeu1, res1);
+        System.out.println();
+    }
+
+    /**
+     * Test cas de la méthode simplifier()
+     * @param jeu plateau de jeu
+     * @param res résultat attendu
+     */
+    void testCasSimplifier(ArrayList<Integer> jeu, ArrayList<Integer> res) {
+        posPerdantes.clear();
+        // Affichage du test
+        System.out.print("simplifier (" + jeu.toString() + ") : ");
+
+        ArrayList<Integer> positionPerdante = new ArrayList<Integer>();
+        positionPerdante.add(4);
+        positionPerdante.add(7);
+        posPerdantes.add(positionPerdante);
+
+        // Execution de la méthode
+        ArrayList<Integer> resExec = new ArrayList<>(simplifier(jeu));
+        // Affichage du résultat
+        System.out.print(resExec.toString() + " : ");
+        if (res.equals(resExec)) {
+            System.out.println("OK\n");
+        } else {
+            System.err.println("ERREUR\n");
+        }
+        posPerdantes.clear();
+    }
+
+    /**
      * Créer un affichage du jeu dans le terminal
      * @param jeu plateau de jeu avec les tas d'allumettes
      */
@@ -436,9 +537,12 @@ class GrundyRecPerdEtGagn {
             }
 
             else {
-                // On normalise le jeu
+                // On normalise le jeu...
                 ArrayList<Integer> jeuNormalise = new ArrayList<>();
                 jeuNormalise = normaliser(jeu);
+
+                //... puis on le simplifie pour éviter encore d'autre calcul redondant
+                jeuNormalise = simplifier(jeuNormalise);
 
                 // On vérifie si la configuration est déjà connue
                 if (estConnuePerdante(jeuNormalise) == true) {
@@ -551,7 +655,6 @@ class GrundyRecPerdEtGagn {
 
             // Affichage de cpt
             System.out.println("cpt : " + cpt);
-            System.out.println(posGagnantes);
 
             posPerdantes.clear();
             posGagnantes.clear();
