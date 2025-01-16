@@ -364,7 +364,7 @@ class GrundyRecGplusGequalsP {
     ArrayList<Integer> simplifier(ArrayList<Integer> jeu) {
         ArrayList<Integer> jeuSimplifier = new ArrayList<>();
         ArrayList<Integer> aSupprimer = new ArrayList<>();
-        ArrayList<Integer> cloneJeuSimplifier = new ArrayList<>();
+        boolean[] estSupprime = new boolean[jeu.size()];
 
         for (int i = 0 ; i < jeu.size() ; i++) {
 
@@ -374,29 +374,30 @@ class GrundyRecGplusGequalsP {
 
             if ( ! posPerdantes.contains( tasParTas ) ) {
                 jeuSimplifier.add( jeu.get(i) );
-                cloneJeuSimplifier.add( jeu.get(i) );
             }
         }
 
         // On procède à la simplification de la Version 4 en comparant chaque élément entre eux
 
-        for (int i = 0 ; i < jeuSimplifier.size() ; i++) {
-            for (int j = 0 ; j < jeuSimplifier.size() ; i++) {
-                if (( !aSupprimer.contains(i) ) && ( !aSupprimer.contains(j) )) {
-                    if (i != j && type[jeuSimplifier.get(i)] == type[jeuSimplifier.get(j)]) {
-                        aSupprimer.add(i);
-                        aSupprimer.add(j);
+        for (int i = 0; i < jeuSimplifier.size(); i++) {
+            if ( !estSupprime[i] && jeuSimplifier.get(i) <= 50) { // Ignorer les tas déjà marqués pour suppression
+                for (int j = i + 1; j < jeuSimplifier.size(); j++) {
+                    if (jeuSimplifier.get(j) <= 50 && !estSupprime[j] && type[jeuSimplifier.get(i)] == type[jeuSimplifier.get(j)]) {
+                        estSupprime[i] = true;
+                        estSupprime[j] = true;
                     }
                 }
             }
         }
-        // A supprimer contient les indices des valeurs a supprimer dans JeuSimplifier
-        // Pour la supression des valeur on a besoins d'un clone de jeuSimplifier
-        for (int i = 0 ; i < aSupprimer.size() ; i++) {
-            jeuSimplifier.remove( aSupprimer.get(i) );
+
+        ArrayList<Integer> resultat = new ArrayList<>();
+        for (int i = 0; i < jeuSimplifier.size(); i++) {
+            if (!estSupprime[i]) {
+                resultat.add(jeuSimplifier.get(i));
+            }
         }
 
-        return jeuSimplifier;
+        return resultat;
     }
 
     /**
@@ -637,7 +638,7 @@ class GrundyRecGplusGequalsP {
         int n = 3;
         jeu.add(n);
 
-        for (int i = 1 ; i <= 43 ; i++) {
+        for (int i = 1 ; i <= 78 ; i++) {
             cpt = 0;
 
             // Initialisation
