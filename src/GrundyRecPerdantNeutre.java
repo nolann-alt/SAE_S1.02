@@ -567,7 +567,7 @@ class GrundyRecPerdantNeutre {
 
     /**
      * Indicates whether the configuration is winning.
-     * This method simply calls "estPerdante".
+     * This method simply calls estPerdante().
      *
      * @param jeu game board
      * @return true if the configuration is winning, false otherwise
@@ -642,11 +642,11 @@ class GrundyRecPerdantNeutre {
     }
 
     /**
-     * Tests a specific case of the joueurGagnant() method.
+     * Tests a specific case of the jouerGagnant() method.
      *
      * @param jeu the game board
      * @param resJeu the game board after playing a winning move
-     * @param res the expected result for joueurGagnant
+     * @param res the expected result for jouerGagnant
      */
     void testCasJouerGagnant(ArrayList<Integer> jeu, ArrayList<Integer> resJeu, boolean res) {
         // Arrange
