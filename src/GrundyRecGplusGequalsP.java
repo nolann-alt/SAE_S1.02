@@ -594,6 +594,8 @@ class GrundyRecGplusGequalsP {
                     }
                 }
                 if (ret) {
+                    // condition pour retirer les jeuNormalise vide (si jeu contient que des tas de 1 et de 2 alors la
+                    // normalisation fait que jeuNormaliser est vide)
                     if (jeuNormalise.size() > 0) {
                         posPerdantes.add(new ArrayList<>(jeuNormalise));
                     }
