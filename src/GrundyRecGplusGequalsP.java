@@ -594,7 +594,9 @@ class GrundyRecGplusGequalsP {
                     }
                 }
                 if (ret) {
-                    posPerdantes.add(new ArrayList<>(jeuNormalise));
+                    if (jeuNormalise.size() > 0) {
+                        posPerdantes.add(new ArrayList<>(jeuNormalise));
+                    }
                 }
             }
         }
@@ -638,7 +640,7 @@ class GrundyRecGplusGequalsP {
         int n = 3;
         jeu.add(n);
 
-        for (int i = 1 ; i <= 81 ; i++) {
+        for (int i = 1 ; i <= 68 ; i++) {
             cpt = 0;
 
             // Initialisation
@@ -646,7 +648,7 @@ class GrundyRecGplusGequalsP {
             jeu.add(n);
 
             t1 = System.nanoTime();
-            estGagnante(jeu);
+            boolean ret = estGagnante(jeu);
             t2 = System.nanoTime();
 
             // Calcul de la difference de temps
@@ -656,7 +658,7 @@ class GrundyRecGplusGequalsP {
 
             // Affichage de cpt
             System.out.println("cpt : " + cpt);
-            System.out.println();
+            System.out.println("estGagnant(jeu) = " + ret);
 
             posPerdantes.clear();
             posGagnantes.clear();
